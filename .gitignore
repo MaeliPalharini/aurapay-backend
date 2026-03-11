@@ -22,3 +22,5 @@ Thumbs.db
 
 # Maven Wrapper jar (opcional manter, normalmente mantém o wrapper inteiro)
 !.mvn/wrapper/maven-wrapper.jar
+
+.workspace.xml
