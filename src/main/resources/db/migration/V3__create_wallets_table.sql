@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS wallets (
+    id BIGSERIAL PRIMARY KEY,
+    customer_id BIGINT NOT NULL UNIQUE,
+    balance NUMERIC(19,2) NOT NULL DEFAULT 0.00,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_wallet_customer
+    FOREIGN KEY (customer_id)
+    REFERENCES customers(id)
+    );
