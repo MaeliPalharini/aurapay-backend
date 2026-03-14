@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+
 @Service
 public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
 
@@ -27,6 +28,12 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
         this.walletRepositoryPort = walletRepositoryPort;
     }
 
+    /**
+     * Cria um novo cliente e sua carteira associada.
+     * Valida os dados de entrada, garante a unicidade do email e do número de documento, e retorna os detalhes do cliente criado junto com a carteira.
+     * @param request
+     * @return
+     */
     @Override
     public CreateCustomerResponse execute(CreateCustomerRequest request) {
         validateRequest(request);
