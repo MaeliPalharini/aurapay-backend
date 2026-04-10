@@ -10,9 +10,9 @@ import com.aurapay.domain.port.in.CreateCustomerUseCase;
 import com.aurapay.domain.port.out.CustomerRepositoryPort;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-
 
 @Service
 public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
@@ -28,13 +28,8 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
         this.walletRepositoryPort = walletRepositoryPort;
     }
 
-    /**
-     * Cria um novo cliente e sua carteira associada.
-     * Valida os dados de entrada, garante a unicidade do email e do número de documento, e retorna os detalhes do cliente criado junto com a carteira.
-     * @param request
-     * @return
-     */
     @Override
+    @Transactional
     public CreateCustomerResponse execute(CreateCustomerRequest request) {
         validateRequest(request);
         validateCustomerUniqueness(request);
@@ -45,13 +40,17 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
         customer.setDocumentNumber(request.getDocumentNumber());
 
         Customer savedCustomer = customerRepositoryPort.save(customer);
+        System.out.println("Customer salvo com ID: " + savedCustomer.getId());
 
         Wallet wallet = new Wallet();
         wallet.setCustomerId(savedCustomer.getId());
         wallet.setBalance(BigDecimal.ZERO);
         wallet.setStatus(WalletStatus.ACTIVE);
 
+        System.out.println("Tentando salvar wallet para customerId: " + savedCustomer.getId());
+
         Wallet savedWallet = walletRepositoryPort.save(wallet);
+        System.out.println("Wallet salva com ID: " + savedWallet.getId());
 
         CreateCustomerResponse response = new CreateCustomerResponse();
         response.setCustomerId(savedCustomer.getId());
@@ -66,6 +65,10 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
     }
 
     private void validateRequest(CreateCustomerRequest request) {
+        if (request == null) {
+            throw new BusinessException("Request body is required");
+        }
+
         if (request.getFullName() == null || request.getFullName().isBlank()) {
             throw new BusinessException("Full name is required");
         }

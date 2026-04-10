@@ -3,6 +3,7 @@ package com.aurapay.application.dto;
 import com.aurapay.domain.model.WalletStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class GetWalletResponse {
 
@@ -10,12 +11,20 @@ public class GetWalletResponse {
     private Long customerId;
     private BigDecimal balance;
     private WalletStatus walletStatus;
+    private LocalDateTime updatedAt;
 
-    public GetWalletResponse(Long walletId, Long customerId, BigDecimal balance, WalletStatus walletStatus) {
+    public GetWalletResponse(
+            Long walletId,
+            Long customerId,
+            BigDecimal balance,
+            WalletStatus walletStatus,
+            LocalDateTime updatedAt
+    ) {
         this.walletId = walletId;
         this.customerId = customerId;
         this.balance = balance;
         this.walletStatus = walletStatus;
+        this.updatedAt = updatedAt;
     }
 
     public Long getWalletId() {
@@ -32,5 +41,9 @@ public class GetWalletResponse {
 
     public WalletStatus getWalletStatus() {
         return walletStatus;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }

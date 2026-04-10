@@ -8,7 +8,6 @@ import com.aurapay.domain.port.in.GetWalletByCustomerIdUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {

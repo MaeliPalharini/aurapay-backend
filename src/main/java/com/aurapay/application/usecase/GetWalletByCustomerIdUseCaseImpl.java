@@ -25,7 +25,8 @@ public class GetWalletByCustomerIdUseCaseImpl implements GetWalletByCustomerIdUs
                 wallet.getId(),
                 wallet.getCustomerId(),
                 wallet.getBalance(),
-                wallet.getStatus()
+                wallet.getStatus(),
+                wallet.getUpdatedAt()
         );
     }
 }
