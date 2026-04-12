@@ -2,27 +2,34 @@ package com.aurapay.application.usecase.piggybank;
 
 import com.aurapay.application.dto.piggybank.WithdrawFromPiggyBankRequest;
 import com.aurapay.application.dto.piggybank.WithdrawFromPiggyBankResponse;
+import com.aurapay.common.exception.BusinessException;
 import com.aurapay.domain.model.piggybank.PiggyBank;
 import com.aurapay.domain.model.piggybank.PiggyBankTransaction;
 import com.aurapay.domain.model.piggybank.TransactionType;
 import com.aurapay.domain.port.in.piggybank.WithdrawFromPiggyBankUseCase;
 import com.aurapay.domain.port.out.pyggybank.PiggyBankRepositoryPort;
 import com.aurapay.domain.port.out.pyggybank.PiggyBankTransactionRepositoryPort;
+import com.aurapay.domain.port.out.WalletRepositoryPort;
+import com.aurapay.domain.model.Wallet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Service
 public class WithdrawFromPiggyBankUseCaseImpl implements WithdrawFromPiggyBankUseCase {
 
     private final PiggyBankRepositoryPort piggyBankRepository;
     private final PiggyBankTransactionRepositoryPort piggyBankTransactionRepository;
+    private final WalletRepositoryPort walletRepository;
 
     public WithdrawFromPiggyBankUseCaseImpl(PiggyBankRepositoryPort piggyBankRepository,
-                                            PiggyBankTransactionRepositoryPort piggyBankTransactionRepository) {
+                                            PiggyBankTransactionRepositoryPort piggyBankTransactionRepository,
+                                            WalletRepositoryPort walletRepository) {
         this.piggyBankRepository = piggyBankRepository;
         this.piggyBankTransactionRepository = piggyBankTransactionRepository;
+        this.walletRepository = walletRepository;
     }
 
     @Override
@@ -31,7 +38,7 @@ public class WithdrawFromPiggyBankUseCaseImpl implements WithdrawFromPiggyBankUs
         PiggyBank piggyBank = piggyBankRepository.findByIdAndCustomerId(
                 request.getPiggyBankId(),
                 request.getCustomerId()
-        ).orElseThrow(() -> new IllegalArgumentException("Cofrinho não encontrado para o cliente informado"));
+        ).orElseThrow(() -> new BusinessException("Cofrinho não encontrado para o cliente informado"));
 
         LocalDateTime now = LocalDateTime.now();
         piggyBank.withdraw(request.getAmount(), now);
@@ -43,6 +50,13 @@ public class WithdrawFromPiggyBankUseCaseImpl implements WithdrawFromPiggyBankUs
                 TransactionType.WITHDRAW_COFRINHO,
                 request.getAmount()
         );
+
+        // Credita o valor resgatado na wallet do cliente
+        Wallet wallet = walletRepository.findByCustomerId(customerId)
+                .orElseThrow(() -> new BusinessException("Carteira não encontrada para o cliente"));
+
+        wallet.setBalance(wallet.getBalance().add(BigDecimal.valueOf(request.getAmount())));
+        walletRepository.save(wallet);
 
         piggyBankRepository.save(piggyBank);
         piggyBankTransactionRepository.save(transaction);

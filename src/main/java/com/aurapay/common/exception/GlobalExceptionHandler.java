@@ -18,6 +18,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             org.springframework.http.converter.HttpMessageNotReadableException ex
     ) {
+        log.warn("Invalid request body", ex);
+
         ErrorResponse errorResponse = new ErrorResponse(
                 400,
                 "Bad Request",
@@ -32,6 +34,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
             org.springframework.dao.DataIntegrityViolationException ex
     ) {
+        log.warn("Data integrity violation", ex);
+
         ErrorResponse errorResponse = new ErrorResponse(
                 409,
                 "Conflict",
@@ -40,6 +44,18 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(com.aurapay.common.exception.BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(com.aurapay.common.exception.BusinessException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                422,
+                "Unprocessable Entity",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)

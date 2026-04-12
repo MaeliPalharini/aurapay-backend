@@ -9,5 +9,5 @@ public class DepositToPiggyBankRequest {
 
     private Long piggyBankId;
     private double amount;
-    private String customerId;
+    private Long customerId;
 }

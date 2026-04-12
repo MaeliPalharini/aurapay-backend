@@ -9,6 +9,8 @@ import com.aurapay.domain.model.WalletStatus;
 import com.aurapay.domain.port.in.CreateCustomerUseCase;
 import com.aurapay.domain.port.out.CustomerRepositoryPort;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,8 @@ import java.math.BigDecimal;
 
 @Service
 public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
+
+    private static final Logger log = LoggerFactory.getLogger(CreateCustomerUseCaseImpl.class);
 
     private final CustomerRepositoryPort customerRepositoryPort;
     private final WalletRepositoryPort walletRepositoryPort;
@@ -40,17 +44,17 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
         customer.setDocumentNumber(request.getDocumentNumber());
 
         Customer savedCustomer = customerRepositoryPort.save(customer);
-        System.out.println("Customer salvo com ID: " + savedCustomer.getId());
+        log.info("Customer salvo com ID: {}", savedCustomer.getId());
 
         Wallet wallet = new Wallet();
         wallet.setCustomerId(savedCustomer.getId());
         wallet.setBalance(BigDecimal.ZERO);
         wallet.setStatus(WalletStatus.ACTIVE);
 
-        System.out.println("Tentando salvar wallet para customerId: " + savedCustomer.getId());
+        log.info("Tentando salvar wallet para customerId: {}", savedCustomer.getId());
 
         Wallet savedWallet = walletRepositoryPort.save(wallet);
-        System.out.println("Wallet salva com ID: " + savedWallet.getId());
+        log.info("Wallet salva com ID: {}", savedWallet.getId());
 
         CreateCustomerResponse response = new CreateCustomerResponse();
         response.setCustomerId(savedCustomer.getId());

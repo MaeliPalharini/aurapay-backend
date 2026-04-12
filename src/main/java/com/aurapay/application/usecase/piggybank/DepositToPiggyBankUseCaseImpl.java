@@ -2,6 +2,7 @@ package com.aurapay.application.usecase.piggybank;
 
 import com.aurapay.application.dto.piggybank.DepositToPiggyBankRequest;
 import com.aurapay.application.dto.piggybank.DepositToPiggyBankResponse;
+import com.aurapay.common.exception.BusinessException;
 import com.aurapay.domain.model.piggybank.PiggyBank;
 import com.aurapay.domain.model.piggybank.PiggyBankTransaction;
 import com.aurapay.domain.model.piggybank.TransactionType;
@@ -35,16 +36,16 @@ public class DepositToPiggyBankUseCaseImpl implements DepositToPiggyBankUseCase 
     public DepositToPiggyBankResponse execute(DepositToPiggyBankRequest request) {
         PiggyBank piggyBank = piggyBankRepository.findByIdAndCustomerId(
                 request.getPiggyBankId(),
-                request.getCustomerId() != null ? Long.valueOf(request.getCustomerId()) : null
-        ).orElseThrow(() -> new IllegalArgumentException("Cofrinho não encontrado para o cliente informado"));
+                request.getCustomerId()
+        ).orElseThrow(() -> new BusinessException("Cofrinho não encontrado para o cliente informado"));
 
         Long customerId = piggyBank.getCustomerId();
 
         Wallet wallet = walletRepository.findByCustomerId(customerId)
-                .orElseThrow(() -> new IllegalArgumentException("Carteira não encontrada para o cliente"));
+                .orElseThrow(() -> new BusinessException("Carteira não encontrada para o cliente"));
 
         if (wallet.getBalance().compareTo(java.math.BigDecimal.valueOf(request.getAmount())) < 0) {
-            throw new IllegalArgumentException("Saldo insuficiente na carteira para realizar o depósito");
+            throw new BusinessException("Saldo insuficiente na carteira para realizar o depósito");
         }
 
         wallet.setBalance(wallet.getBalance().subtract(java.math.BigDecimal.valueOf(request.getAmount())));
