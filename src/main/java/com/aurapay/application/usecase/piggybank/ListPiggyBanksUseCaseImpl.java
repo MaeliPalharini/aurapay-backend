@@ -41,6 +41,15 @@ public class ListPiggyBanksUseCaseImpl implements ListPiggyBanksUseCase {
         s.setCurrentAmount(pb.getCurrentAmount() != null ? pb.getCurrentAmount().doubleValue() : 0.0);
         s.setStatus(pb.getStatus() != null ? pb.getStatus().name() : null);
         s.setCreatedAt(pb.getCreatedAt() != null ? pb.getCreatedAt().toString() : null);
+        String imageUrl = null;
+        if (pb.getName() != null) {
+            String nome = pb.getName().trim().toLowerCase();
+            if (nome.equals("carro")) imageUrl = "/cofrinhos/Carro.png";
+            else if (nome.equals("casa")) imageUrl = "/cofrinhos/Casa.png";
+            else if (nome.equals("lazer")) imageUrl = "/cofrinhos/Lazer.png";
+            else if (nome.equals("viagem")) imageUrl = "/cofrinhos/Viagem.png";
+        }
+        s.setImageUrl(imageUrl);
         return s;
     }
 }

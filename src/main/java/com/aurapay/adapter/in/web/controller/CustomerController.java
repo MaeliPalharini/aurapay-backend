@@ -8,6 +8,9 @@ import com.aurapay.application.dto.DepositToWalletResponse;
 import com.aurapay.domain.port.in.CreateCustomerUseCase;
 import com.aurapay.domain.port.in.GetWalletByCustomerIdUseCase;
 import com.aurapay.domain.port.in.DepositToWalletUseCase;
+import com.aurapay.domain.port.in.LoginUseCase;
+import com.aurapay.application.dto.LoginRequest;
+import com.aurapay.application.dto.LoginResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,21 +21,30 @@ public class CustomerController {
     private final CreateCustomerUseCase createCustomerUseCase;
     private final GetWalletByCustomerIdUseCase getWalletByCustomerIdUseCase;
     private final DepositToWalletUseCase depositToWalletUseCase;
+    private final LoginUseCase loginUseCase;
 
     public CustomerController(
             CreateCustomerUseCase createCustomerUseCase,
             GetWalletByCustomerIdUseCase getWalletByCustomerIdUseCase,
-            DepositToWalletUseCase depositToWalletUseCase
+            DepositToWalletUseCase depositToWalletUseCase,
+            LoginUseCase loginUseCase
     ) {
         this.createCustomerUseCase = createCustomerUseCase;
         this.getWalletByCustomerIdUseCase = getWalletByCustomerIdUseCase;
         this.depositToWalletUseCase = depositToWalletUseCase;
+        this.loginUseCase = loginUseCase;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateCustomerResponse createCustomer(@RequestBody CreateCustomerRequest request) {
         return createCustomerUseCase.execute(request);
+    }
+
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return loginUseCase.execute(request);
     }
 
     @GetMapping("/{customerId}/wallet")

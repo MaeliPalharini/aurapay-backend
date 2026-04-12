@@ -19,6 +19,6 @@ public class ListPiggyBanksResponse {
         private Double currentAmount;
         private String status;
         private String createdAt;
+        private String imageUrl;
     }
 }
-

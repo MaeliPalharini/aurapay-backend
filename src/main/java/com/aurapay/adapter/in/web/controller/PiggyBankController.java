@@ -8,11 +8,7 @@ import com.aurapay.application.dto.piggybank.ListPiggyBanksResponse;
 import com.aurapay.application.dto.piggybank.WithdrawFromPiggyBankRequest;
 import com.aurapay.application.dto.piggybank.WithdrawFromPiggyBankResponse;
 import com.aurapay.application.dto.piggybank.PiggyBankYieldHistoryResponse;
-import com.aurapay.domain.port.in.piggybank.CreatePiggyBankUseCase;
-import com.aurapay.domain.port.in.piggybank.DepositToPiggyBankUseCase;
-import com.aurapay.domain.port.in.piggybank.ListPiggyBanksUseCase;
-import com.aurapay.domain.port.in.piggybank.WithdrawFromPiggyBankUseCase;
-import com.aurapay.domain.port.in.piggybank.GetPiggyBankYieldHistoryUseCase;
+import com.aurapay.domain.port.in.piggybank.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,17 +21,19 @@ public class PiggyBankController {
     private final DepositToPiggyBankUseCase depositToPiggyBankUseCase;
     private final WithdrawFromPiggyBankUseCase withdrawFromPiggyBankUseCase;
     private final GetPiggyBankYieldHistoryUseCase getPiggyBankYieldHistoryUseCase;
+    private final DeletePiggyBankUseCase deletePiggyBankUseCase;
 
     public PiggyBankController(CreatePiggyBankUseCase createPiggyBankUseCase,
                                ListPiggyBanksUseCase listPiggyBanksUseCase,
                                DepositToPiggyBankUseCase depositToPiggyBankUseCase,
                                WithdrawFromPiggyBankUseCase withdrawFromPiggyBankUseCase,
-                               GetPiggyBankYieldHistoryUseCase getPiggyBankYieldHistoryUseCase) {
+                               GetPiggyBankYieldHistoryUseCase getPiggyBankYieldHistoryUseCase, DeletePiggyBankUseCase deletePiggyBankUseCase) {
         this.createPiggyBankUseCase = createPiggyBankUseCase;
         this.listPiggyBanksUseCase = listPiggyBanksUseCase;
         this.depositToPiggyBankUseCase = depositToPiggyBankUseCase;
         this.withdrawFromPiggyBankUseCase = withdrawFromPiggyBankUseCase;
         this.getPiggyBankYieldHistoryUseCase = getPiggyBankYieldHistoryUseCase;
+        this.deletePiggyBankUseCase = deletePiggyBankUseCase;
     }
 
     @PostMapping
@@ -70,5 +68,11 @@ public class PiggyBankController {
     @ResponseStatus(HttpStatus.OK)
     public PiggyBankYieldHistoryResponse yieldHistory(@PathVariable Long piggyBankId) {
         return getPiggyBankYieldHistoryUseCase.execute(piggyBankId);
+    }
+
+    @DeleteMapping("/{piggyBankId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long piggyBankId, @RequestParam Long customerId) {
+        deletePiggyBankUseCase.execute(piggyBankId, customerId);
     }
 }
