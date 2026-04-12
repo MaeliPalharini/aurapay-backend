@@ -43,11 +43,11 @@ public class DepositToPiggyBankUseCaseImpl implements DepositToPiggyBankUseCase 
         Wallet wallet = walletRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("Carteira não encontrada para o cliente"));
 
-        if (wallet.getBalance().compareTo(request.getAmount()) < 0) {
+        if (wallet.getBalance().compareTo(java.math.BigDecimal.valueOf(request.getAmount())) < 0) {
             throw new IllegalArgumentException("Saldo insuficiente na carteira para realizar o depósito");
         }
 
-        wallet.setBalance(wallet.getBalance().subtract(request.getAmount()));
+        wallet.setBalance(wallet.getBalance().subtract(java.math.BigDecimal.valueOf(request.getAmount())));
         walletRepository.save(wallet);
 
         LocalDateTime now = LocalDateTime.now();
