@@ -25,3 +25,9 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+
+mercado-pago:
+  mock: ${MERCADO_PAGO_MOCK:true}
+  base-url: ${MERCADO_PAGO_BASE_URL:https://api.mercadopago.com}
+  access-token: ${MERCADO_PAGO_ACCESS_TOKEN:APP_USR-6858446136022057-051019-83206d52a067a1bd865985c90ed84790-3387283458}botão
+  default-payer-email: ${MERCADO_PAGO_DEFAULT_PAYER_EMAIL:test_user_6188487840237858658@testuser.com}
