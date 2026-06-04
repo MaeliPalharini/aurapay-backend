@@ -11,6 +11,7 @@ import com.aurapay.domain.port.out.CustomerRepositoryPort;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +24,16 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
 
     private final CustomerRepositoryPort customerRepositoryPort;
     private final WalletRepositoryPort walletRepositoryPort;
+    private final PasswordEncoder passwordEncoder;
 
     public CreateCustomerUseCaseImpl(
             CustomerRepositoryPort customerRepositoryPort,
-            WalletRepositoryPort walletRepositoryPort
+            WalletRepositoryPort walletRepositoryPort,
+            PasswordEncoder passwordEncoder
     ) {
         this.customerRepositoryPort = customerRepositoryPort;
         this.walletRepositoryPort = walletRepositoryPort;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -42,6 +46,7 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
         customer.setFullName(request.getFullName());
         customer.setEmail(request.getEmail());
         customer.setDocumentNumber(request.getDocumentNumber());
+        customer.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
         Customer savedCustomer = customerRepositoryPort.save(customer);
         log.info("Customer salvo com ID: {}", savedCustomer.getId());
@@ -83,6 +88,14 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
 
         if (request.getDocumentNumber() == null || request.getDocumentNumber().isBlank()) {
             throw new BusinessException("Document number is required");
+        }
+
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new BusinessException("Password is required");
+        }
+
+        if (request.getPassword().length() < 6) {
+            throw new BusinessException("Password must be at least 6 characters long");
         }
     }
 

@@ -10,7 +10,9 @@ import com.aurapay.domain.port.in.piggybank.WithdrawFromPiggyBankUseCase;
 import com.aurapay.domain.port.out.pyggybank.PiggyBankRepositoryPort;
 import com.aurapay.domain.port.out.pyggybank.PiggyBankTransactionRepositoryPort;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
+import com.aurapay.domain.port.out.WalletTransactionRepositoryPort;
 import com.aurapay.domain.model.Wallet;
+import com.aurapay.domain.model.WalletTransaction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +25,16 @@ public class WithdrawFromPiggyBankUseCaseImpl implements WithdrawFromPiggyBankUs
     private final PiggyBankRepositoryPort piggyBankRepository;
     private final PiggyBankTransactionRepositoryPort piggyBankTransactionRepository;
     private final WalletRepositoryPort walletRepository;
+    private final WalletTransactionRepositoryPort walletTransactionRepository;
 
     public WithdrawFromPiggyBankUseCaseImpl(PiggyBankRepositoryPort piggyBankRepository,
                                             PiggyBankTransactionRepositoryPort piggyBankTransactionRepository,
-                                            WalletRepositoryPort walletRepository) {
+                                            WalletRepositoryPort walletRepository,
+                                            WalletTransactionRepositoryPort walletTransactionRepository) {
         this.piggyBankRepository = piggyBankRepository;
         this.piggyBankTransactionRepository = piggyBankTransactionRepository;
         this.walletRepository = walletRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
     }
 
     @Override
@@ -60,6 +65,9 @@ public class WithdrawFromPiggyBankUseCaseImpl implements WithdrawFromPiggyBankUs
 
         piggyBankRepository.save(piggyBank);
         piggyBankTransactionRepository.save(transaction);
+
+        walletTransactionRepository.save(WalletTransaction.piggyBankWithdraw(
+                customerId, wallet.getId(), BigDecimal.valueOf(request.getAmount())));
 
         WithdrawFromPiggyBankResponse response = new WithdrawFromPiggyBankResponse();
         response.setStatus("SUCCESS");

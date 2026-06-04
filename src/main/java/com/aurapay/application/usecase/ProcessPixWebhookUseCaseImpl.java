@@ -5,10 +5,12 @@ import com.aurapay.common.exception.BusinessException;
 import com.aurapay.domain.model.PixPayment;
 import com.aurapay.domain.model.PixStatus;
 import com.aurapay.domain.model.Wallet;
+import com.aurapay.domain.model.WalletTransaction;
 import com.aurapay.domain.port.in.ProcessPixWebhookUseCase;
 import com.aurapay.domain.port.out.MercadoPagoPort;
 import com.aurapay.domain.port.out.PixPaymentRepositoryPort;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
+import com.aurapay.domain.port.out.WalletTransactionRepositoryPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,15 +26,18 @@ public class ProcessPixWebhookUseCaseImpl implements ProcessPixWebhookUseCase {
     private final PixPaymentRepositoryPort pixPaymentRepository;
     private final MercadoPagoPort mercadoPagoPort;
     private final WalletRepositoryPort walletRepository;
+    private final WalletTransactionRepositoryPort walletTransactionRepository;
 
     public ProcessPixWebhookUseCaseImpl(
             PixPaymentRepositoryPort pixPaymentRepository,
             MercadoPagoPort mercadoPagoPort,
-            WalletRepositoryPort walletRepository
+            WalletRepositoryPort walletRepository,
+            WalletTransactionRepositoryPort walletTransactionRepository
     ) {
         this.pixPaymentRepository = pixPaymentRepository;
         this.mercadoPagoPort = mercadoPagoPort;
         this.walletRepository = walletRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
     }
 
     @Override
@@ -75,6 +80,9 @@ public class ProcessPixWebhookUseCaseImpl implements ProcessPixWebhookUseCase {
 
         wallet.setBalance(wallet.getBalance().add(payment.getAmount()));
         walletRepository.save(wallet);
+
+        walletTransactionRepository.save(WalletTransaction.pixReceived(
+                payment.getCustomerId(), wallet.getId(), payment.getAmount()));
 
         log.info("Wallet {} creditada em {} para pagamento Pix {}.",
                 wallet.getId(), payment.getAmount(), payment.getId());

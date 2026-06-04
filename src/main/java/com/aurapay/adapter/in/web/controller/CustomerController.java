@@ -8,9 +8,11 @@ import com.aurapay.application.dto.DepositToWalletResponse;
 import com.aurapay.domain.port.in.CreateCustomerUseCase;
 import com.aurapay.domain.port.in.GetWalletByCustomerIdUseCase;
 import com.aurapay.domain.port.in.DepositToWalletUseCase;
+import com.aurapay.domain.port.in.GetStatementUseCase;
 import com.aurapay.domain.port.in.LoginUseCase;
 import com.aurapay.application.dto.LoginRequest;
 import com.aurapay.application.dto.LoginResponse;
+import com.aurapay.application.dto.StatementResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,17 +24,20 @@ public class CustomerController {
     private final GetWalletByCustomerIdUseCase getWalletByCustomerIdUseCase;
     private final DepositToWalletUseCase depositToWalletUseCase;
     private final LoginUseCase loginUseCase;
+    private final GetStatementUseCase getStatementUseCase;
 
     public CustomerController(
             CreateCustomerUseCase createCustomerUseCase,
             GetWalletByCustomerIdUseCase getWalletByCustomerIdUseCase,
             DepositToWalletUseCase depositToWalletUseCase,
-            LoginUseCase loginUseCase
+            LoginUseCase loginUseCase,
+            GetStatementUseCase getStatementUseCase
     ) {
         this.createCustomerUseCase = createCustomerUseCase;
         this.getWalletByCustomerIdUseCase = getWalletByCustomerIdUseCase;
         this.depositToWalletUseCase = depositToWalletUseCase;
         this.loginUseCase = loginUseCase;
+        this.getStatementUseCase = getStatementUseCase;
     }
 
     @PostMapping
@@ -51,6 +56,12 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.OK)
     public GetWalletResponse getWalletByCustomerId(@PathVariable Long customerId) {
         return getWalletByCustomerIdUseCase.execute(customerId);
+    }
+
+    @GetMapping("/{customerId}/extrato")
+    @ResponseStatus(HttpStatus.OK)
+    public StatementResponse getStatement(@PathVariable Long customerId) {
+        return getStatementUseCase.execute(customerId);
     }
 
     @PostMapping("/{customerId}/wallet/deposit")

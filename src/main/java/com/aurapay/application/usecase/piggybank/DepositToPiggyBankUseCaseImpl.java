@@ -10,10 +10,13 @@ import com.aurapay.domain.port.in.piggybank.DepositToPiggyBankUseCase;
 import com.aurapay.domain.port.out.pyggybank.PiggyBankRepositoryPort;
 import com.aurapay.domain.port.out.pyggybank.PiggyBankTransactionRepositoryPort;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
+import com.aurapay.domain.port.out.WalletTransactionRepositoryPort;
 import com.aurapay.domain.model.Wallet;
+import com.aurapay.domain.model.WalletTransaction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -22,13 +25,16 @@ public class DepositToPiggyBankUseCaseImpl implements DepositToPiggyBankUseCase 
     private final PiggyBankRepositoryPort piggyBankRepository;
     private final PiggyBankTransactionRepositoryPort piggyBankTransactionRepository;
     private final WalletRepositoryPort walletRepository;
+    private final WalletTransactionRepositoryPort walletTransactionRepository;
 
     public DepositToPiggyBankUseCaseImpl(PiggyBankRepositoryPort piggyBankRepository,
                                          PiggyBankTransactionRepositoryPort piggyBankTransactionRepository,
-                                         WalletRepositoryPort walletRepository) {
+                                         WalletRepositoryPort walletRepository,
+                                         WalletTransactionRepositoryPort walletTransactionRepository) {
         this.piggyBankRepository = piggyBankRepository;
         this.piggyBankTransactionRepository = piggyBankTransactionRepository;
         this.walletRepository = walletRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
     }
 
     @Override
@@ -63,6 +69,9 @@ public class DepositToPiggyBankUseCaseImpl implements DepositToPiggyBankUseCase 
 
         piggyBankRepository.save(piggyBank);
         piggyBankTransactionRepository.save(transaction);
+
+        walletTransactionRepository.save(WalletTransaction.piggyBankDeposit(
+                customerId, wallet.getId(), BigDecimal.valueOf(request.getAmount())));
 
         DepositToPiggyBankResponse response = new DepositToPiggyBankResponse();
         response.setStatus("SUCCESS");

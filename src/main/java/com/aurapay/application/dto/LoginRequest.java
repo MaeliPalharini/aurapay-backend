@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class LoginRequest {
     private String email;
-    private String documentNumber; // Vamos usar email e documento para simular o login, sem senha por enquanto
+    private String password;
 }
 

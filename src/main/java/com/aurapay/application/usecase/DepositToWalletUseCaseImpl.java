@@ -4,8 +4,10 @@ import com.aurapay.application.dto.DepositToWalletRequest;
 import com.aurapay.application.dto.DepositToWalletResponse;
 import com.aurapay.common.exception.BusinessException;
 import com.aurapay.domain.model.Wallet;
+import com.aurapay.domain.model.WalletTransaction;
 import com.aurapay.domain.port.in.DepositToWalletUseCase;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
+import com.aurapay.domain.port.out.WalletTransactionRepositoryPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +17,14 @@ import java.math.BigDecimal;
 public class DepositToWalletUseCaseImpl implements DepositToWalletUseCase {
 
     private final WalletRepositoryPort walletRepository;
+    private final WalletTransactionRepositoryPort walletTransactionRepository;
 
-    public DepositToWalletUseCaseImpl(WalletRepositoryPort walletRepository) {
+    public DepositToWalletUseCaseImpl(
+            WalletRepositoryPort walletRepository,
+            WalletTransactionRepositoryPort walletTransactionRepository
+    ) {
         this.walletRepository = walletRepository;
+        this.walletTransactionRepository = walletTransactionRepository;
     }
 
     @Override
@@ -36,6 +43,9 @@ public class DepositToWalletUseCaseImpl implements DepositToWalletUseCase {
 
         wallet.setBalance(wallet.getBalance().add(BigDecimal.valueOf(request.getAmount())));
         Wallet saved = walletRepository.save(wallet);
+
+        walletTransactionRepository.save(WalletTransaction.deposit(
+                saved.getCustomerId(), saved.getId(), BigDecimal.valueOf(request.getAmount())));
 
         DepositToWalletResponse response = new DepositToWalletResponse();
         response.setStatus("SUCCESS");
