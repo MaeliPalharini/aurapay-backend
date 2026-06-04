@@ -6,12 +6,15 @@ import com.aurapay.application.dto.CreatePixPaymentResponse;
 import com.aurapay.application.dto.MercadoPagoWebhookPayload;
 import com.aurapay.application.dto.PixKeyResponse;
 import com.aurapay.application.dto.PixPaymentResponse;
+import com.aurapay.application.dto.SendPixRequest;
+import com.aurapay.application.dto.SendPixResponse;
 import com.aurapay.domain.model.PixPayment;
 import com.aurapay.domain.port.in.CreatePixKeyUseCase;
 import com.aurapay.domain.port.in.CreatePixPaymentUseCase;
 import com.aurapay.domain.port.in.GetPixPaymentUseCase;
 import com.aurapay.domain.port.in.ListPixKeysByCustomerUseCase;
 import com.aurapay.domain.port.in.ProcessPixWebhookUseCase;
+import com.aurapay.domain.port.in.SendPixUseCase;
 import com.aurapay.domain.port.in.SimulatePixApprovalUseCase;
 import com.aurapay.domain.port.out.PixPaymentRepositoryPort;
 import org.slf4j.Logger;
@@ -35,6 +38,7 @@ public class PixController {
     private final PixPaymentRepositoryPort pixPaymentRepository;
     private final CreatePixKeyUseCase createPixKeyUseCase;
     private final ListPixKeysByCustomerUseCase listPixKeysByCustomerUseCase;
+    private final SendPixUseCase sendPixUseCase;
 
     public PixController(
             CreatePixPaymentUseCase createPixPaymentUseCase,
@@ -43,7 +47,8 @@ public class PixController {
             SimulatePixApprovalUseCase simulatePixApprovalUseCase,
             PixPaymentRepositoryPort pixPaymentRepository,
             CreatePixKeyUseCase createPixKeyUseCase,
-            ListPixKeysByCustomerUseCase listPixKeysByCustomerUseCase
+            ListPixKeysByCustomerUseCase listPixKeysByCustomerUseCase,
+            SendPixUseCase sendPixUseCase
     ) {
         this.createPixPaymentUseCase = createPixPaymentUseCase;
         this.getPixPaymentUseCase = getPixPaymentUseCase;
@@ -52,6 +57,7 @@ public class PixController {
         this.pixPaymentRepository = pixPaymentRepository;
         this.createPixKeyUseCase = createPixKeyUseCase;
         this.listPixKeysByCustomerUseCase = listPixKeysByCustomerUseCase;
+        this.sendPixUseCase = sendPixUseCase;
     }
 
     @PostMapping("/payments")
@@ -82,6 +88,12 @@ public class PixController {
     @ResponseStatus(HttpStatus.OK)
     public PixPaymentResponse simulateApproval(@PathVariable Long id) {
         return simulatePixApprovalUseCase.execute(id);
+    }
+
+    @PostMapping("/transfers")
+    @ResponseStatus(HttpStatus.OK)
+    public SendPixResponse sendPix(@RequestBody SendPixRequest request) {
+        return sendPixUseCase.execute(request);
     }
 
     @PostMapping("/keys")

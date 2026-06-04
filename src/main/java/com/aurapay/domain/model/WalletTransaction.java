@@ -51,6 +51,11 @@ public class WalletTransaction {
                 TransactionDirection.CREDIT, amount, "Pix recebido", null);
     }
 
+    public static WalletTransaction pixSent(Long customerId, Long walletId, BigDecimal amount) {
+        return new WalletTransaction(customerId, walletId, WalletTransactionType.PIX_SENT,
+                TransactionDirection.DEBIT, amount, "Pix enviado", null);
+    }
+
     public static WalletTransaction piggyBankDeposit(Long customerId, Long walletId, BigDecimal amount) {
         return new WalletTransaction(customerId, walletId, WalletTransactionType.PIGGY_BANK_DEPOSIT,
                 TransactionDirection.DEBIT, amount, "Valor enviado para o cofrinho", null);
