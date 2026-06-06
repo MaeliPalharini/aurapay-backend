@@ -1,10 +1,13 @@
 package com.aurapay.adapter.in.web.controller;
 
+import com.aurapay.application.dto.CardDepositRequest;
+import com.aurapay.application.dto.CardDepositResponse;
 import com.aurapay.application.dto.CreateCustomerRequest;
 import com.aurapay.application.dto.CreateCustomerResponse;
 import com.aurapay.application.dto.GetWalletResponse;
 import com.aurapay.application.dto.DepositToWalletRequest;
 import com.aurapay.application.dto.DepositToWalletResponse;
+import com.aurapay.domain.port.in.CreateCardDepositUseCase;
 import com.aurapay.domain.port.in.CreateCustomerUseCase;
 import com.aurapay.domain.port.in.GetWalletByCustomerIdUseCase;
 import com.aurapay.domain.port.in.DepositToWalletUseCase;
@@ -23,6 +26,7 @@ public class CustomerController {
     private final CreateCustomerUseCase createCustomerUseCase;
     private final GetWalletByCustomerIdUseCase getWalletByCustomerIdUseCase;
     private final DepositToWalletUseCase depositToWalletUseCase;
+    private final CreateCardDepositUseCase createCardDepositUseCase;
     private final LoginUseCase loginUseCase;
     private final GetStatementUseCase getStatementUseCase;
 
@@ -30,12 +34,14 @@ public class CustomerController {
             CreateCustomerUseCase createCustomerUseCase,
             GetWalletByCustomerIdUseCase getWalletByCustomerIdUseCase,
             DepositToWalletUseCase depositToWalletUseCase,
+            CreateCardDepositUseCase createCardDepositUseCase,
             LoginUseCase loginUseCase,
             GetStatementUseCase getStatementUseCase
     ) {
         this.createCustomerUseCase = createCustomerUseCase;
         this.getWalletByCustomerIdUseCase = getWalletByCustomerIdUseCase;
         this.depositToWalletUseCase = depositToWalletUseCase;
+        this.createCardDepositUseCase = createCardDepositUseCase;
         this.loginUseCase = loginUseCase;
         this.getStatementUseCase = getStatementUseCase;
     }
@@ -72,6 +78,16 @@ public class CustomerController {
     ) {
         request.setCustomerId(customerId);
         return depositToWalletUseCase.execute(request);
+    }
+
+    @PostMapping("/{customerId}/wallet/card-deposit")
+    @ResponseStatus(HttpStatus.OK)
+    public CardDepositResponse cardDeposit(
+            @PathVariable Long customerId,
+            @RequestBody CardDepositRequest request
+    ) {
+        request.setCustomerId(customerId);
+        return createCardDepositUseCase.execute(request);
     }
 
 }

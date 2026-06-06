@@ -27,13 +27,13 @@ server:
   port: ${SERVER_PORT:8080}
 
 mercado-pago:
-  mock: ${MERCADO_PAGO_MOCK:true}
+  mock: ${MERCADO_PAGO_MOCK:false}
   base-url: ${MERCADO_PAGO_BASE_URL:https://api.mercadopago.com}
-  access-token: ${MERCADO_PAGO_ACCESS_TOKEN:APP_USR-6858446136022057-051019-83206d52a067a1bd865985c90ed84790-3387283458}
-  default-payer-email: ${MERCADO_PAGO_DEFAULT_PAYER_EMAIL:test_user_6188487840237858658@testuser.com}
+  access-token: ${MERCADO_PAGO_ACCESS_TOKEN:TEST-2493260850463805-051018-4da519795595307dbc651187b8758881-155409700}
+  default-payer-email: ${MERCADO_PAGO_DEFAULT_PAYER_EMAIL:cliente.aurapay@gmail.com}
+  notification-url: ${MERCADO_PAGO_NOTIFICATION_URL:}
 
 security:
   jwt:
-    # Em produção, defina JWT_SECRET com pelo menos 32 caracteres (256 bits para HS256).
     secret: ${JWT_SECRET:aurapay-dev-secret-troque-em-producao-0123456789}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:120}

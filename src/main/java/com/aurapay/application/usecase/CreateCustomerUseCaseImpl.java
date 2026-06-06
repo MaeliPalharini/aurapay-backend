@@ -3,6 +3,7 @@ package com.aurapay.application.usecase;
 import com.aurapay.application.dto.CreateCustomerRequest;
 import com.aurapay.application.dto.CreateCustomerResponse;
 import com.aurapay.common.exception.BusinessException;
+import com.aurapay.common.validation.CpfValidator;
 import com.aurapay.domain.model.Customer;
 import com.aurapay.domain.model.Wallet;
 import com.aurapay.domain.model.WalletStatus;
@@ -88,6 +89,14 @@ public class CreateCustomerUseCaseImpl implements CreateCustomerUseCase {
 
         if (request.getDocumentNumber() == null || request.getDocumentNumber().isBlank()) {
             throw new BusinessException("Document number is required");
+        }
+
+        if (!request.getDocumentNumber().matches("\\d{11}")) {
+            throw new BusinessException("CPF deve conter exatamente 11 dígitos numéricos, sem pontos ou traços");
+        }
+
+        if (!CpfValidator.isValid(request.getDocumentNumber())) {
+            throw new BusinessException("CPF inválido");
         }
 
         if (request.getPassword() == null || request.getPassword().isBlank()) {

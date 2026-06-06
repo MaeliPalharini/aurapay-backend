@@ -11,6 +11,7 @@ import com.aurapay.application.dto.SendPixResponse;
 import com.aurapay.domain.model.PixPayment;
 import com.aurapay.domain.port.in.CreatePixKeyUseCase;
 import com.aurapay.domain.port.in.CreatePixPaymentUseCase;
+import com.aurapay.domain.port.in.DeletePixKeyUseCase;
 import com.aurapay.domain.port.in.GetPixPaymentUseCase;
 import com.aurapay.domain.port.in.ListPixKeysByCustomerUseCase;
 import com.aurapay.domain.port.in.ProcessPixWebhookUseCase;
@@ -38,6 +39,7 @@ public class PixController {
     private final PixPaymentRepositoryPort pixPaymentRepository;
     private final CreatePixKeyUseCase createPixKeyUseCase;
     private final ListPixKeysByCustomerUseCase listPixKeysByCustomerUseCase;
+    private final DeletePixKeyUseCase deletePixKeyUseCase;
     private final SendPixUseCase sendPixUseCase;
 
     public PixController(
@@ -48,6 +50,7 @@ public class PixController {
             PixPaymentRepositoryPort pixPaymentRepository,
             CreatePixKeyUseCase createPixKeyUseCase,
             ListPixKeysByCustomerUseCase listPixKeysByCustomerUseCase,
+            DeletePixKeyUseCase deletePixKeyUseCase,
             SendPixUseCase sendPixUseCase
     ) {
         this.createPixPaymentUseCase = createPixPaymentUseCase;
@@ -57,6 +60,7 @@ public class PixController {
         this.pixPaymentRepository = pixPaymentRepository;
         this.createPixKeyUseCase = createPixKeyUseCase;
         this.listPixKeysByCustomerUseCase = listPixKeysByCustomerUseCase;
+        this.deletePixKeyUseCase = deletePixKeyUseCase;
         this.sendPixUseCase = sendPixUseCase;
     }
 
@@ -106,6 +110,12 @@ public class PixController {
     @ResponseStatus(HttpStatus.OK)
     public List<PixKeyResponse> listKeys(@RequestParam Long customerId) {
         return listPixKeysByCustomerUseCase.execute(customerId);
+    }
+
+    @DeleteMapping("/keys/{pixKeyId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteKey(@PathVariable Long pixKeyId, @RequestParam Long customerId) {
+        deletePixKeyUseCase.execute(pixKeyId, customerId);
     }
 
     @GetMapping(value = "/mock/ticket/{mpId}", produces = MediaType.TEXT_HTML_VALUE)

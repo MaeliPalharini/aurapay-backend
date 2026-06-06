@@ -4,10 +4,12 @@ import com.aurapay.application.dto.CreatePixPaymentRequest;
 import com.aurapay.application.dto.CreatePixPaymentResponse;
 import com.aurapay.application.dto.MercadoPagoPixCharge;
 import com.aurapay.common.exception.BusinessException;
+import com.aurapay.domain.model.Customer;
 import com.aurapay.domain.model.PixPayment;
 import com.aurapay.domain.model.PixStatus;
 import com.aurapay.domain.model.Wallet;
 import com.aurapay.domain.port.in.CreatePixPaymentUseCase;
+import com.aurapay.domain.port.out.CustomerRepositoryPort;
 import com.aurapay.domain.port.out.MercadoPagoPort;
 import com.aurapay.domain.port.out.PixPaymentRepositoryPort;
 import com.aurapay.domain.port.out.WalletRepositoryPort;
@@ -23,15 +25,18 @@ public class CreatePixPaymentUseCaseImpl implements CreatePixPaymentUseCase {
     private final WalletRepositoryPort walletRepository;
     private final PixPaymentRepositoryPort pixPaymentRepository;
     private final MercadoPagoPort mercadoPagoPort;
+    private final CustomerRepositoryPort customerRepository;
 
     public CreatePixPaymentUseCaseImpl(
             WalletRepositoryPort walletRepository,
             PixPaymentRepositoryPort pixPaymentRepository,
-            MercadoPagoPort mercadoPagoPort
+            MercadoPagoPort mercadoPagoPort,
+            CustomerRepositoryPort customerRepository
     ) {
         this.walletRepository = walletRepository;
         this.pixPaymentRepository = pixPaymentRepository;
         this.mercadoPagoPort = mercadoPagoPort;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -47,11 +52,16 @@ public class CreatePixPaymentUseCaseImpl implements CreatePixPaymentUseCase {
         Wallet wallet = walletRepository.findByCustomerId(request.getCustomerId())
                 .orElseThrow(() -> new BusinessException("Carteira não encontrada para o cliente"));
 
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new BusinessException("Cliente não encontrado"));
+
         PixPayment pixPayment = new PixPayment();
         pixPayment.setCustomerId(request.getCustomerId());
         pixPayment.setWalletId(wallet.getId());
         pixPayment.setAmount(request.getAmount());
         pixPayment.setStatus(PixStatus.PENDING);
+        pixPayment.setPayerName(customer.getFullName());
+        pixPayment.setPayerEmail(customer.getEmail());
         pixPayment.setCreatedAt(LocalDateTime.now());
         pixPayment.setUpdatedAt(LocalDateTime.now());
 

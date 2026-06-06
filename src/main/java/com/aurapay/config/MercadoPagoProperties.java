@@ -14,5 +14,6 @@ public class MercadoPagoProperties {
     private String baseUrl = "https://api.mercadopago.com";
     private String accessToken;
     private String defaultPayerEmail;
+    private String notificationUrl;
     private boolean mock = false;
 }

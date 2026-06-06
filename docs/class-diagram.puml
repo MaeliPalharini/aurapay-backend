@@ -1,0 +1,178 @@
+@startuml AuraPay - Diagrama de Classes (Modelo de Dominio)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam class {
+  BorderColor #37474F
+  ArrowColor #607D8B
+}
+hide circle
+
+' ===== Paleta por subsistema =====
+' Azul   -> Conta / Cliente
+' Verde  -> Carteira
+' Roxo   -> PIX
+' Laranja-> Cofrinho
+' Cinza  -> Enums
+
+class Customer #E3F2FD {
+  - id : Long
+  - fullName : String
+  - email : String
+  - documentNumber : String
+  - passwordHash : String
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+}
+
+class Wallet #E8F5E9 {
+  - id : Long
+  - customerId : Long
+  - balance : BigDecimal
+  - status : WalletStatus
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+}
+
+class WalletTransaction #E8F5E9 {
+  - id : Long
+  - customerId : Long
+  - walletId : Long
+  - type : WalletTransactionType
+  - direction : TransactionDirection
+  - amount : BigDecimal
+  - description : String
+  - counterpartName : String
+  - createdAt : LocalDateTime
+  + deposit() : WalletTransaction
+  + pixReceived() : WalletTransaction
+  + cardDeposit() : WalletTransaction
+  + pixSent() : WalletTransaction
+  + piggyBankDeposit() : WalletTransaction
+  + piggyBankWithdraw() : WalletTransaction
+}
+
+class PixKey #F3E5F5 {
+  - id : Long
+  - customerId : Long
+  - keyValue : String
+  - createdAt : LocalDateTime
+}
+
+class PixPayment #F3E5F5 {
+  - id : Long
+  - customerId : Long
+  - walletId : Long
+  - amount : BigDecimal
+  - status : PixStatus
+  - mercadoPagoPaymentId : String
+  - qrCode : String
+  - qrCodeBase64 : String
+  - ticketUrl : String
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+}
+
+class PiggyBank #FFF3E0 {
+  - id : Long
+  - customerId : Long
+  - name : String
+  - targetAmount : BigDecimal
+  - currentAmount : BigDecimal
+  - status : PiggyBankStatus
+  - transactionCount : Long
+  - totalYieldAmount : BigDecimal
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+  + deposit(amount) : void
+  + withdraw(amount) : void
+  + canWithdraw(amount) : boolean
+  + applyYield(amount) : void
+  + close() : void
+}
+
+class PiggyBankTransaction #FFF3E0 {
+  - id : Long
+  - piggyBankId : Long
+  - customerId : Long
+  - type : TransactionType
+  - amount : BigDecimal
+  - createdAt : LocalDateTime
+  - updatedAt : LocalDateTime
+  + isDeposit() : boolean
+  + isWithdraw() : boolean
+}
+
+class PiggyBankYield #FFF3E0 {
+  - id : Long
+  - piggyBankId : Long
+  - customerId : Long
+  - yieldAmount : BigDecimal
+  - yieldDate : LocalDate
+  - createdAt : LocalDateTime
+}
+
+enum WalletStatus #ECEFF1 {
+  ACTIVE
+  BLOCKED
+}
+
+enum WalletTransactionType #ECEFF1 {
+  DEPOSIT
+  PIX_RECEIVED
+  PIX_SENT
+  CARD_DEPOSIT
+  PIGGY_BANK_DEPOSIT
+  PIGGY_BANK_WITHDRAW
+}
+
+enum TransactionDirection #ECEFF1 {
+  CREDIT
+  DEBIT
+}
+
+enum PixStatus #ECEFF1 {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+enum PiggyBankStatus #ECEFF1 {
+  ACTIVE
+  CLOSED
+}
+
+enum TransactionType #ECEFF1 {
+  DEPOSIT_COFRINHO
+  WITHDRAW_COFRINHO
+}
+
+' Associacoes (por chave estrangeira)
+Customer "1" -- "1" Wallet : possui
+Customer "1" -- "0..*" PixKey : cadastra
+Customer "1" -- "0..*" PixPayment : solicita
+Wallet "1" -- "0..*" WalletTransaction : registra
+Customer "1" -- "0..*" PiggyBank : possui
+PiggyBank "1" -- "0..*" PiggyBankTransaction : movimenta
+PiggyBank "1" -- "0..*" PiggyBankYield : rende
+
+' Dependencias de tipo (enums)
+Wallet ..> WalletStatus
+WalletTransaction ..> WalletTransactionType
+WalletTransaction ..> TransactionDirection
+PixPayment ..> PixStatus
+PiggyBank ..> PiggyBankStatus
+PiggyBankTransaction ..> TransactionType
+
+legend right
+  Subsistemas (por cor):
+  <back:#E3F2FD>Conta / Cliente</back>
+  <back:#E8F5E9>Carteira</back>
+  <back:#F3E5F5>PIX</back>
+  <back:#FFF3E0>Cofrinho</back>
+  <back:#ECEFF1>Enums</back>
+endlegend
+
+@enduml

@@ -21,4 +21,8 @@ public class PixPayment {
     private String ticketUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Dados do pagador, usados só para montar a cobrança no Mercado Pago (não são persistidos).
+    private String payerName;
+    private String payerEmail;
 }

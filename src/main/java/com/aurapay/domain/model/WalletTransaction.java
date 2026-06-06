@@ -51,6 +51,11 @@ public class WalletTransaction {
                 TransactionDirection.CREDIT, amount, "Pix recebido", null);
     }
 
+    public static WalletTransaction cardDeposit(Long customerId, Long walletId, BigDecimal amount) {
+        return new WalletTransaction(customerId, walletId, WalletTransactionType.CARD_DEPOSIT,
+                TransactionDirection.CREDIT, amount, "Recarga via cartão", null);
+    }
+
     public static WalletTransaction pixSent(Long customerId, Long walletId, BigDecimal amount) {
         return new WalletTransaction(customerId, walletId, WalletTransactionType.PIX_SENT,
                 TransactionDirection.DEBIT, amount, "Pix enviado", null);
